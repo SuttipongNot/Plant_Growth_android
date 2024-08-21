@@ -1,0 +1,4 @@
+<resources>
+    <string name="root_url">http://10.13.2.209:3000/api/house</string>
+    <string name="app_name">House Price</string>
+</resources>
