@@ -1,5 +1,7 @@
 package th.ac.rmutto.houseprice
 
+import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.os.Bundle
 import android.os.StrictMode
 import android.widget.Button
@@ -18,6 +20,12 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
+    @SuppressLint("DefaultLocale")
+
+    lateinit var editTextAge: EditText
+    lateinit var editTextDistance: EditText
+    lateinit var editTextMinimart: EditText
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -32,9 +40,9 @@ class MainActivity : AppCompatActivity() {
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
 
-        val editTextAge = findViewById<EditText>(R.id.editTextAge)
-        val editTextDistance = findViewById<EditText>(R.id.editTextDistance)
-        val editTextMinimart = findViewById<EditText>(R.id.editTextMinimart)
+        editTextAge = findViewById(R.id.editTextAge)
+        editTextDistance = findViewById(R.id.editTextDistance)
+        editTextMinimart = findViewById(R.id.editTextMinimart)
         val btnPredict = findViewById<Button>(R.id.btnPredict)
 
         btnPredict.setOnClickListener {
@@ -55,11 +63,12 @@ class MainActivity : AppCompatActivity() {
             if (response.isSuccessful) {
                 val data = JSONObject(response.body!!.string())
                 if (data.length() > 0) {
-                    var message = "ราคาประเมินบ้าน คือ " + data.getString("price") +"บาท/ตารางเมตร"
+                    val price = String.format("%,.0f", data.getDouble("price") * 1000)
+                    val message = "ราคาประเมินบ้าน คือ $price บาท/ตารางเมตร"
                     val builder = AlertDialog.Builder(this)
                     builder.setTitle("ระบบประเมินราคาบ้าน!!")
                     builder.setMessage(message)
-                    builder.setNeutralButton("OK", null)
+                    builder.setNeutralButton("OK", clearText())
                     val alert = builder.create()
                     alert.show()
 
@@ -67,7 +76,16 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(applicationContext, "ไม่สามารถเชื่อต่อกับเซิร์ฟเวอร์ได้", Toast.LENGTH_LONG).show()
             }
-        }
+        }//button predict
+    }//onCreate function
 
+    private fun clearText(): DialogInterface.OnClickListener? {
+        return DialogInterface.OnClickListener { dialog, which ->
+            editTextAge.text.clear()
+            editTextDistance.text.clear()
+            editTextMinimart.text.clear()
+            editTextAge.requestFocus()
+        }
     }
-}
+
+}//main class
