@@ -44,6 +44,20 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+
+        //To run network operations on a main thread or as an synchronous task.
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
+
+        spinnerSoilType = findViewById(R.id.spinnerSoilType)
+        editTextSunlightHours = findViewById(R.id.editTextSunlightHours)
+        spinnerWaterFequency = findViewById(R.id.spinnerWaterFrequency)
+        spinnerFertilizerType = findViewById(R.id.spinnerFertilizerType)
+        editTextTemperature = findViewById(R.id.editTextTemperature)
+        editTextHumidity = findViewById(R.id.editTextHumidity)
+
+        val btnPredict = findViewById<Button>(R.id.btnPredict)
+
         val  adapSoilType = ArrayAdapter.createFromResource(
             this,
             R.array.SoilType,
@@ -67,20 +81,6 @@ class MainActivity : AppCompatActivity() {
         )
         adapFertilizerType.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerFertilizerType.setAdapter(adapFertilizerType)
-
-
-        //To run network operations on a main thread or as an synchronous task.
-        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-        StrictMode.setThreadPolicy(policy)
-
-        spinnerSoilType = findViewById(R.id.spinnerSoilType)
-        editTextSunlightHours = findViewById(R.id.editTextSunlightHours)
-        spinnerWaterFequency = findViewById(R.id.spinnerWaterFrequency)
-        spinnerFertilizerType = findViewById(R.id.spinnerFertilizerType)
-        editTextTemperature = findViewById(R.id.editTextTemperature)
-        editTextHumidity = findViewById(R.id.editTextHumidity)
-
-        val btnPredict = findViewById<Button>(R.id.btnPredict)
 
         btnPredict.setOnClickListener {
             if (editTextSunlightHours.text.isEmpty() || editTextTemperature.text.isEmpty() || editTextHumidity.text.isEmpty()){
@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
             if (response.isSuccessful) {
                 val data = JSONObject(response.body!!.string())
                 if (data.length() > 0) {
-                    val Growth_Milestone = data.getDouble("Growth_Milestone")
+                    val Growth_Milestone = data.getInt("Growth_Milestone")
                     val message = "ผลของการเจริญเติบโตของพืช คือ $Growth_Milestone "
                     val builder = AlertDialog.Builder(this)
                     builder.setTitle("ระบบทำนายการเจริญเติบโตของพืช")

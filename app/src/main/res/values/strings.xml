@@ -1,5 +1,5 @@
 <resources>
-    <string name="root_url">http://172.20.10.3:3000/api/house</string>
+    <string name="root_url">http://10.13.3.96:3000/api/plant_growth</string>
     <string name="app_name">Plant Growth</string>
     
     <string-array name="SoilType">
