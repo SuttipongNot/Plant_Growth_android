@@ -1,4 +1,20 @@
 <resources>
     <string name="root_url">http://172.20.10.3:3000/api/house</string>
-    <string name="app_name">House Price</string>
+    <string name="app_name">Plant Growth</string>
+    
+    <string-array name="SoilType">
+        <item>clay</item>
+        <item>sandy</item>
+        <item>loam</item>
+    </string-array>
+    <string-array name="WaterFrequency">
+        <item>daily</item>
+        <item>weekly</item>
+        <item>bi-weekly</item>
+    </string-array>
+    <string-array name="FertilizerType">
+        <item>none</item>
+        <item>chemical</item>
+        <item>organic</item>
+    </string-array>
 </resources>

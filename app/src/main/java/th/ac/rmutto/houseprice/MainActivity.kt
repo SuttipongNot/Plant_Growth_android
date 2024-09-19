@@ -2,10 +2,13 @@ package th.ac.rmutto.houseprice
 
 import android.annotation.SuppressLint
 import android.content.DialogInterface
+import android.health.connect.datatypes.units.Temperature
 import android.os.Bundle
 import android.os.StrictMode
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
@@ -22,9 +25,14 @@ import org.json.JSONObject
 class MainActivity : AppCompatActivity() {
     @SuppressLint("DefaultLocale")
 
-    lateinit var editTextAge: EditText
-    lateinit var editTextDistance: EditText
-    lateinit var editTextMinimart: EditText
+    lateinit var spinnerSoilType: Spinner
+    lateinit var editTextSunlightHours: EditText
+    lateinit var spinnerWaterFequency: Spinner
+    lateinit var spinnerFertilizerType: Spinner
+    lateinit var editTextTemperature: EditText
+    lateinit var editTextHumidity: EditText
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,23 +44,59 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        val  adapSoilType = ArrayAdapter.createFromResource(
+            this,
+            R.array.SoilType,
+            android.R.layout.simple_spinner_item
+        )
+        adapSoilType.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSoilType.setAdapter(adapSoilType)
+
+        val  adapWaterFrequency = ArrayAdapter.createFromResource(
+            this,
+            R.array.WaterFrequency,
+            android.R.layout.simple_spinner_item
+        )
+        adapWaterFrequency.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerWaterFequency.setAdapter(adapWaterFrequency)
+
+        val  adapFertilizerType = ArrayAdapter.createFromResource(
+            this,
+            R.array.FertilizerType,
+            android.R.layout.simple_spinner_item
+        )
+        adapFertilizerType.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerFertilizerType.setAdapter(adapFertilizerType)
+
+
         //To run network operations on a main thread or as an synchronous task.
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
 
-        editTextAge = findViewById(R.id.editTextAge)
-        editTextDistance = findViewById(R.id.editTextDistance)
-        editTextMinimart = findViewById(R.id.editTextMinimart)
+        spinnerSoilType = findViewById(R.id.spinnerSoilType)
+        editTextSunlightHours = findViewById(R.id.editTextSunlightHours)
+        spinnerWaterFequency = findViewById(R.id.spinnerWaterFrequency)
+        spinnerFertilizerType = findViewById(R.id.spinnerFertilizerType)
+        editTextTemperature = findViewById(R.id.editTextTemperature)
+        editTextHumidity = findViewById(R.id.editTextHumidity)
+
         val btnPredict = findViewById<Button>(R.id.btnPredict)
 
         btnPredict.setOnClickListener {
+            if (editTextSunlightHours.text.isEmpty() || editTextTemperature.text.isEmpty() || editTextHumidity.text.isEmpty()){
+                Toast.makeText(applicationContext, "กรุณากรอกข้อมูลให้ครบถ้วน", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
             val url: String = getString(R.string.root_url)
 
             val okHttpClient = OkHttpClient()
             val formBody: RequestBody = FormBody.Builder()
-                .add("age", editTextAge?.text.toString())
-                .add("distance", editTextDistance?.text.toString())
-                .add("minimart", editTextMinimart?.text.toString())
+                .add("Soil_Type", spinnerSoilType.selectedItemId.toString())
+                .add("Sunlight_Hours", editTextSunlightHours.text.toString())
+                .add("Water_Frequency", spinnerWaterFequency.selectedItemId.toString())
+                .add("Fertilizer_Type", spinnerFertilizerType.selectedItemId.toString())
+                .add("Temperature", editTextTemperature.text.toString())
+                .add("Humidity", editTextHumidity.text.toString())
                 .build()
             val request: Request = Request.Builder()
                 .url(url)
@@ -63,10 +107,10 @@ class MainActivity : AppCompatActivity() {
             if (response.isSuccessful) {
                 val data = JSONObject(response.body!!.string())
                 if (data.length() > 0) {
-                    val price = String.format("%,.0f", data.getDouble("price") * 1000)
-                    val message = "ราคาประเมินบ้าน คือ $price บาท/ตารางเมตร"
+                    val Growth_Milestone = data.getDouble("Growth_Milestone")
+                    val message = "ผลของการเจริญเติบโตของพืช คือ $Growth_Milestone "
                     val builder = AlertDialog.Builder(this)
-                    builder.setTitle("ระบบประเมินราคาบ้าน!!")
+                    builder.setTitle("ระบบทำนายการเจริญเติบโตของพืช")
                     builder.setMessage(message)
                     builder.setNeutralButton("OK", clearText())
                     val alert = builder.create()
@@ -81,10 +125,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun clearText(): DialogInterface.OnClickListener? {
         return DialogInterface.OnClickListener { dialog, which ->
-            editTextAge.text.clear()
-            editTextDistance.text.clear()
-            editTextMinimart.text.clear()
-            editTextAge.requestFocus()
+            spinnerSoilType.setSelection(0)
+            editTextSunlightHours.text.clear()
+            spinnerWaterFequency.setSelection(0)
+            spinnerFertilizerType.setSelection(0)
+            editTextTemperature.text.clear()
+            editTextHumidity.text.clear()
         }
     }
 
